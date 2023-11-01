@@ -1,0 +1,168 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+using namespace std;
+class DirectoryEntry {
+public:
+    DirectoryEntry(const string& companyName, const string& owner, const string& phone, const string& address, const string& businessType)
+        : companyName_(companyName), owner_(owner), phone_(phone), address_(address), businessType_(businessType) {}
+    string GetCompanyName() const { return companyName_; }
+    string GetOwner() const { return owner_; }
+    string GetPhone() const { return phone_; }
+    string GetAddress() const { return address_; }
+    string GetBusinessType() const { return businessType_; }
+    void Display() const {
+        cout << "Company Name: " << companyName_ << endl;
+        cout << "Owner: " << owner_ << endl;
+        cout << "Phone: " << phone_ << endl;
+        cout << "Address: " << address_ << endl;
+        cout << "Business Type: " << businessType_ << endl;
+        cout << "----------------------" << endl;
+    }
+private:
+    string companyName_;
+    string owner_;
+    string phone_;
+    string address_;
+    string businessType_;
+};
+class Directory {
+public:
+    Directory(const string& filename) : filename_(filename) {
+        LoadData();
+    }
+    void AddEntry(const DirectoryEntry& entry) {
+        entries_.push_back(entry);
+        SaveData();
+        cout << "Entry added." << endl;
+    }
+    void SearchByCompanyName(const string& companyName) {
+        for (const DirectoryEntry& entry : entries_) {
+            if (entry.GetCompanyName() == companyName) {
+                entry.Display();
+            }
+        }
+    }
+    void SearchByOwner(const string& owner) {
+        for (const DirectoryEntry& entry : entries_) {
+            if (entry.GetOwner() == owner) {
+                entry.Display();
+            }
+        }
+    }
+    void SearchByPhone(const string& phone) {
+        for (const DirectoryEntry& entry : entries_) {
+            if (entry.GetPhone() == phone) {
+                entry.Display();
+            }
+        }
+    }
+    void SearchByBusinessType(const string& businessType) {
+        for (const DirectoryEntry& entry : entries_) {
+            if (entry.GetBusinessType() == businessType) {
+                entry.Display();
+            }
+        }
+    }
+    void ShowAllEntries() {
+        for (const DirectoryEntry& entry : entries_) {
+            entry.Display();
+        }
+    }
+private:
+    void LoadData() {
+        ifstream file(filename_);
+        if (file.is_open()) {
+            entries_.clear();
+            string companyName, owner, phone, address, businessType;
+            while (file >> companyName >> owner >> phone >> address >> businessType) {
+                entries_.emplace_back(companyName, owner, phone, address, businessType);
+            }
+            file.close();
+        }
+    }
+    void SaveData() {
+        ofstream file(filename_);
+        if (file.is_open()) {
+            for (const DirectoryEntry& entry : entries_) {
+                file << entry.GetCompanyName() << " " << entry.GetOwner() << " " << entry.GetPhone() << " " << entry.GetAddress() << " " << entry.GetBusinessType() << "\n";
+            }
+            file.close();
+        }
+    }
+    string filename_;
+    vector<DirectoryEntry> entries_;
+};
+int main() {
+    Directory directory("directory.txt");
+    int choice;
+
+    do {
+        cout << "Select an action:" << endl;
+        cout << "1. Add an entry" << endl;
+        cout << "2. Search by company name" << endl;
+        cout << "3. Search by owner" << endl;
+        cout << "4. Search by phone" << endl;
+        cout << "5. Search by business type" << endl;
+        cout << "6. Show all entries" << endl;
+        cout << "0. Exit" << endl;
+        cin >> choice;
+        switch (choice) {
+        case 1: {
+            string companyName, owner, phone, address, businessType;
+            cout << "Enter Company Name: ";
+            cin >> companyName;
+            cout << "Enter Owner: ";
+            cin >> owner;
+            cout << "Enter Phone: ";
+            cin >> phone;
+            cout << "Enter Address: ";
+            cin >> address;
+            cout << "Enter Business Type: ";
+            cin >> businessType;
+            DirectoryEntry entry(companyName, owner, phone, address, businessType);
+            directory.AddEntry(entry);
+            break;
+        }
+        case 2: {
+            string companyName;
+            cout << "Enter Company Name to search: ";
+            cin >> companyName;
+            directory.SearchByCompanyName(companyName);
+            break;
+        }
+        case 3: {
+            string owner;
+            cout << "Enter Owner to search: ";
+            cin >> owner;
+            directory.SearchByOwner(owner);
+            break;
+        }
+        case 4: {
+            string phone;
+            cout << "Enter Phone to search: ";
+            cin >> phone;
+            directory.SearchByPhone(phone);
+            break;
+        }
+        case 5: {
+            string businessType;
+            cout << "Enter Business Type to search: ";
+            cin >> businessType;
+            directory.SearchByBusinessType(businessType);
+            break;
+        }
+        case 6:
+            directory.ShowAllEntries();
+            break;
+        case 0:
+            cout << "Exiting." << endl;
+            break;
+        default:
+            cout << "Invalid choice. Try again." << endl;
+            break;
+        }
+    } while (choice != 0);
+    return 0;
+}
